@@ -2,21 +2,21 @@ pipeline {
     agent any
 
     environment {
-        GIT_CREDENTIALS = 'github-token' // Replace with your GitHub credentials ID if needed
+        GIT_CREDENTIALS = credentials('github-token') // Replace 'github-token' with your Jenkins credentials ID
     }
 
     stages {
         stage('Clone Repository') {
             steps {
                 script {
-                    git url: 'https://github.com/venkatsatish07/Bangalore_North0786.git', branch: 'main'
+                    git credentialsId: GIT_CREDENTIALS, url: 'https://github.com/venkatsatish07/gs-spring-boot.git', branch: 'main'
                 }
             }
         }
 
         stage('Build') {
             steps {
-                dir('complete') { // Navigate to 'complete' directory
+                dir('complete') {
                     echo 'Building the application...'
                     sh 'mvn clean package'
                 }
@@ -25,7 +25,7 @@ pipeline {
 
         stage('Test') {
             steps {
-                dir('complete') { // Navigate to 'complete' directory
+                dir('complete') {
                     echo 'Running tests...'
                     sh 'mvn test'
                 }
@@ -35,7 +35,6 @@ pipeline {
         stage('Deploy') {
             steps {
                 echo 'Deploying the application...'
-                // Assuming you have Kubernetes configuration files in the repo
                 sh 'kubectl apply -f k8s/deployment.yaml'
                 sh 'kubectl apply -f k8s/service.yaml'
             }
